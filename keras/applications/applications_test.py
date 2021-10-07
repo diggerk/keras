@@ -70,6 +70,23 @@ NASNET_LIST = [
 
 MODEL_LIST = MODEL_LIST_NO_NASNET + NASNET_LIST
 
+# Parameters for loading weights for MobileNetV3.
+# (class, alpha, minimalistic, include_top)
+MOBILENET_V3_FOR_WEIGHTS = [
+    (mobilenet_v3.MobileNetV3Large, 0.75, False, False),
+    (mobilenet_v3.MobileNetV3Large, 1.0, False, False),
+    (mobilenet_v3.MobileNetV3Large, 1.0, True, False),
+    (mobilenet_v3.MobileNetV3Large, 0.75, False, True),
+    (mobilenet_v3.MobileNetV3Large, 1.0, False, True),
+    (mobilenet_v3.MobileNetV3Large, 1.0, True, True),
+    (mobilenet_v3.MobileNetV3Small, 0.75, False, False),
+    (mobilenet_v3.MobileNetV3Small, 1.0, False, False),
+    (mobilenet_v3.MobileNetV3Small, 1.0, True, False),
+    (mobilenet_v3.MobileNetV3Small, 0.75, False, True),
+    (mobilenet_v3.MobileNetV3Small, 1.0, False, True),
+    (mobilenet_v3.MobileNetV3Small, 1.0, True, True),
+]
+
 
 class ApplicationsTest(tf.test.TestCase, parameterized.TestCase):
 
@@ -136,6 +153,20 @@ class ApplicationsTest(tf.test.TestCase, parameterized.TestCase):
     else:
       self.assertShapeEqual(output_shape, (None, None, None, last_dim))
     backend.clear_session()
+
+  @parameterized.parameters(*MOBILENET_V3_FOR_WEIGHTS)
+  def test_mobilenet_v3_load_weights(
+      self,
+      mobilenet_class,
+      alpha,
+      minimalistic,
+      include_top):
+    mobilenet_class(
+        input_shape=(224, 224, 3),
+        weights='imagenet',
+        alpha=alpha,
+        minimalistic=minimalistic,
+        include_top=include_top)
 
 
 def _get_output_shape(model_fn):
